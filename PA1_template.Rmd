@@ -23,6 +23,7 @@ sumpasospordia
 ```
 
 
+
 Make a histogram of the total number of steps taken each day
 "Histograms are used to show distributions of variables while bar charts are used to compare variables.
 "Histograms plot quantitative data with ranges of the data grouped into bins or intervals while bar charts plot categorical data. "
@@ -45,15 +46,24 @@ mediantotalpasosdia
 ```
 
 
+The mean is `r meantotalpasosdia` from the total steps by day.
+
+The median is `r mediantotalpasosdia` from the total steps by day.
+
+
+
+
+
 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 ```{r, echo=TRUE}
-mean.intervalsteps <- tapply(pasos$steps, pasos$interval, function(x) mean(x, na.rm=T))
-xrange <- 1:length(mean.intervalsteps)
-plot( xrange, mean.intervalsteps, type = "l", main="time series", xlab="5 minute interval", ylab="Average Number of steps")
-
-
+meanpasosint <- tapply(pasos$steps, pasos$interval, function(x) mean(x, na.rm=T))
+ejex <- 1:length(meanpasosint)
+plot( ejex, meanpasosint, type = "l", main="time series", xlab="5 minute interval", ylab="Average Number of steps")
 ```
+
+
+
 Create a vector to easily indentify weekdays and weekends
 
 ```{r, echo=TRUE}
@@ -65,12 +75,14 @@ finde <- c("Saturday", "Sunday")
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r, echo=TRUE}
-max.mean <- max(mean.intervalsteps)
-highest.interval <- mean.intervalsteps[xrange[mean.intervalsteps==max.mean]]
-highest.interval
+meanmayor <- max(meanpasosint)
+intemayor <- meanpasosint[ejex[meanpasosint==meanmayor]]
+intemayor
 ```
 
-The 5-minute interval is 835 with the high average number of steps of 206.16
+
+
+The 5-minute interval is 835 with the high average number of steps of `r intemayor`
 
 
 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
@@ -80,7 +92,7 @@ cantidadpasosna <-sum(is.na(pasos))
 cantidadpasosna
 ```
 
-Total number of NAs  is 2304.
+Total number of NAs  is `r cantidadpasosna`.
 
 Devise a strategy for filling in all of the missing values in the dataset. 
 Strategy: use the mean accross all days for the 5-min interval where NA is found.
@@ -97,7 +109,7 @@ Apply strategy to fill in
 ```{r,echo=TRUE}
 for (i in 1:nrow(pasos)) {
     if (is.na(pasos$steps[i])) {
-        copiapasos$steps[i] <- mean.intervalsteps[as.character(pasos$interval[i])]
+        copiapasos$steps[i] <- meanpasosint[as.character(pasos$interval[i])]
     }
 }
 ```
