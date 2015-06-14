@@ -38,12 +38,11 @@ Make a histogram of the total number of steps taken each day.
 
 If you do not understand the difference between a histogram and a barplot, research the difference between them:  
 
----
+
 *"Histograms are used to show distributions of variables while bar charts are used to compare variables.
 "Histograms plot quantitative data with ranges of the data grouped into bins or intervals while bar charts plot categorical data. "
  histograms are used to show distributions of variables while bar charts are used to compare variables. Histograms plot binned quantitative data while bar charts plot categorical data. Bars can be reordered in bar charts but not in histograms."
 "source Naomi Robins, A Histogram is NOT a barchart @ forbes 1/04/2012.*
----
 
 
 
