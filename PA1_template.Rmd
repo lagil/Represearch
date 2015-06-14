@@ -1,0 +1,166 @@
+----
+Assignment #1
+
+----
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+
+Load data into the "pasos" dataframe
+
+````{r, echo=TRUE}
+pasos <- read.csv(file = "activity.csv", header = TRUE, sep = ",")
+summary(pasos)
+```
+
+
+Calculate the total number of steps taken per day and store the information into the sumpasospordia variable
+
+```{r, echo=TRUE}
+sumpasospordia <- aggregate(pasos$steps, by = list(pasos$date), sum, na.rm = TRUE)
+names(sumpasospordia) <- c("date", "steps")
+sumpasospordia
+```
+
+
+Make a histogram of the total number of steps taken each day
+"Histograms are used to show distributions of variables while bar charts are used to compare variables.
+"Histograms plot quantitative data with ranges of the data grouped into bins or intervals while bar charts plot categorical data. "
+ histograms are used to show distributions of variables while bar charts are used to compare variables. Histograms plot binned quantitative data while bar charts plot categorical data. Bars can be reordered in bar charts but not in histograms."
+"source Naomi Robins, A Histogram is NOT a barchart @ forbes 1/04/2012.
+
+```{r, echo=TRUE}
+hist(sumpasospordia$steps, border = "blue", main = "Histogram of total steps per day", xlab="Steps")
+```
+
+
+Calculate and report the mean and median of the total number of steps taken per day
+
+```{r, echo=TRUE}
+meantotalpasosdia <- round(mean(sumpasospordia$steps, na.rm = TRUE),4)
+meantotalpasosdia
+
+mediantotalpasosdia <- median(sumpasospordia$steps, na.rm = TRUE)
+mediantotalpasosdia
+```
+
+
+Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```{r, echo=TRUE}
+mean.intervalsteps <- tapply(pasos$steps, pasos$interval, function(x) mean(x, na.rm=T))
+xrange <- 1:length(mean.intervalsteps)
+plot( xrange, mean.intervalsteps, type = "l", main="time series", xlab="5 minute interval", ylab="Average Number of steps")
+
+
+```
+Create a vector to easily indentify weekdays and weekends
+
+```{r, echo=TRUE}
+semana <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+finde <- c("Saturday", "Sunday")
+```
+
+
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```{r, echo=TRUE}
+max.mean <- max(mean.intervalsteps)
+highest.interval <- mean.intervalsteps[xrange[mean.intervalsteps==max.mean]]
+highest.interval
+```
+
+The 5-minute interval is 835 with the high average number of steps of 206.16
+
+
+Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+```{r,echo=TRUE}
+cantidadpasosna <-sum(is.na(pasos))
+cantidadpasosna
+```
+
+Total number of NAs  is 2304.
+
+Devise a strategy for filling in all of the missing values in the dataset. 
+Strategy: use the mean accross all days for the 5-min interval where NA is found.
+
+Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+```{r, echo=TRUE}
+copiapasos <- pasos
+```
+
+
+Apply strategy to fill in
+
+```{r,echo=TRUE}
+for (i in 1:nrow(pasos)) {
+    if (is.na(pasos$steps[i])) {
+        copiapasos$steps[i] <- mean.intervalsteps[as.character(pasos$interval[i])]
+    }
+}
+```
+
+
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Same as above with different data frame. 
+
+```{r, echo=TRUE}
+sumpasospordia2 <- aggregate(copiapasos$steps, by = list(copiapasos$date), sum)
+names(sumpasospordia2) <- c("date", "steps")
+sumpasospordia2
+```
+
+
+```{r, echo=TRUE}
+hist(sumpasospordia2$steps, border = "green", main = "Histogram of total steps per day", xlab="Steps")
+```
+
+
+```{r, echo=TRUE}
+meantotalpasosdia2 <- round(mean(sumpasospordia2$steps),4)
+meantotalpasosdia2
+
+mediantotalpasosdia2 <- round(median(sumpasospordia2$steps),4)
+mediantotalpasosdia2
+```
+
+Mean and median are differente from the previuos calculations wich included the NA values.
+
+
+Get the info about the weekdays and weekends dates    
+
+```{r, echo=TRUE}
+copiapasos$date <- as.Date(copiapasos$date)
+copiapasos$day <- weekdays(copiapasos$date)
+copiapasos$day[copiapasos$day %in% semana] <- "weekday"
+copiapasos$day[copiapasos$day %in% finde] <- "weekend"
+copiapasos$day <- factor(copiapasos$day)
+```
+
+
+Split the data into weekend and weekday data
+
+```{r, echo=TRUE}
+tipodia <- split(copiapasos, copiapasos$day)
+infodiasemana <- tipodia$weekday
+infodiafinde <- tipodia$weekend
+```
+
+
+Obtain the means by each type of day based on the intervals
+
+```{r,echo=TRUE}
+meandiassemana <- tapply(infodiasemana$steps, infodiasemana$interval, function(x) mean(x, rm.na=TRUE))
+meandiafinde <- tapply(infodiafinde$steps, infodiafinde$interval, function(x) mean(x, rm.na=TRUE))
+
+rango <- 1:length(meandiassemana)
+```
+
+
+Plot comparison graphs between weekend data and weekday data
+
+```{r,echo=TRUE}
+plot(rango, meandiafinde, type="l", main="Weekend", xlab="Interval", ylab="Number of steps", xaxt="n")
+plot(rango, meandiassemana, type="l", main="Week", xlab="Interval", ylab="Number of steps")
+```
